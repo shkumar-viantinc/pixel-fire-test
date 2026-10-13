@@ -11,6 +11,7 @@
       --text: #e7ecf3;
       --muted: #9aa8bc;
       --accent: #3d8bfd;
+      --idle: #5a6a82;
       --ok: #3dd68c;
       --err: #f07178;
     }
@@ -53,11 +54,15 @@
       font-family: "IBM Plex Mono", ui-monospace, monospace;
       font-size: .85em;
     }
+    .actions {
+      display: flex;
+      flex-direction: column;
+      gap: .75rem;
+    }
     button {
       appearance: none;
       border: 0;
       border-radius: 10px;
-      background: linear-gradient(180deg, #4d97ff, var(--accent));
       color: white;
       font: inherit;
       font-weight: 600;
@@ -65,9 +70,17 @@
       width: 100%;
       cursor: pointer;
       transition: transform .12s ease, filter .12s ease;
+      font-variant-numeric: tabular-nums;
     }
-    button:hover { filter: brightness(1.05); }
-    button:active { transform: translateY(1px); }
+    button.fire {
+      background: linear-gradient(180deg, #4d97ff, var(--accent));
+    }
+    button.nofire {
+      background: linear-gradient(180deg, #6b7c94, var(--idle));
+      cursor: default;
+    }
+    button.fire:hover { filter: brightness(1.05); }
+    button.fire:active { transform: translateY(1px); }
     #status {
       margin-top: 1rem;
       min-height: 1.4em;
@@ -89,27 +102,28 @@
   <main>
     <h1>Universal Pixel Fire Test</h1>
     <p class="meta">
-      Pixel <code id="upidLabel">118357</code>
-      · event <code>Click</code> (<code>p1=click</code> / id <code>233203</code>)
-      · advertiser <code>111648</code> hackathon
+      Advertiser <code>111648</code> hackathon
       · agency <code>29755</code> runtime_agency (mcp7)
       · campaign <code>563612</code> / order <code>2704998</code>
+      · wired Click event on <code>118357</code> only
     </p>
-    <button id="fireBtn" type="button">Fire pixel</button>
-    <div id="status">Ready — click to fire.</div>
+    <div class="actions">
+      <button id="fireBtn118357" class="fire" type="button">Fire pixel 118357</button>
+      <button id="pixelBtn118358" class="nofire" type="button" disabled>Pixel 118358 (do not fire)</button>
+    </div>
+    <div id="status">Ready — only 118357 fires.</div>
     <p class="hint">
-      Fires <code>https://ad.ipredictive.com/d/track/event?upid=…</code>
-      as a 1×1 image request with <code>p1=click</code> so the Click event rule matches.
-      Check Network for a 200 JPEG, then verify activity on the pixel in DSP.
+      <code>118357</code> fires <code>/d/track/event</code> with <code>p1=click</code>.
+      <code>118358</code> is listed for ID clarity only — this button does not send a request.
     </p>
   </main>
   <script>
-    const UPID = '118357';
+    const FIRE_UPID = '118357';
     const ENDPOINT = 'https://ad.ipredictive.com/d/track/event';
 
-    function buildUrl() {
+    function buildUrl(upid) {
       const params = new URLSearchParams({
-        upid: UPID,
+        upid: upid,
         url: location.href,
         ref: document.referrer || '',
         p1: 'click',
@@ -119,14 +133,12 @@
       return ENDPOINT + '?' + params.toString();
     }
 
-    function firePixel() {
+    function firePixel(upid) {
       const status = document.getElementById('status');
-      const url = buildUrl();
+      const url = buildUrl(upid);
       status.className = '';
-      status.textContent = 'Firing…';
+      status.textContent = 'Firing ' + upid + '…';
 
-      // /d/track/event returns 200 with an empty body; Image() may call onerror.
-      // Prefer sendBeacon / fetch(no-cors), then Image fallback.
       let sent = false;
       if (navigator.sendBeacon) {
         sent = navigator.sendBeacon(url);
@@ -137,10 +149,11 @@
       const img = new Image();
       img.src = url;
       status.className = 'ok';
-      status.textContent = 'Fired via /d/track/event — ' + url;
+      status.textContent = 'Fired pixel ' + upid + ' via /d/track/event — ' + url;
     }
 
-    document.getElementById('fireBtn').addEventListener('click', firePixel);
+    document.getElementById('fireBtn118357').addEventListener('click', () => firePixel(FIRE_UPID));
+    // 118358 intentionally has no click handler and is disabled.
   </script>
 </body>
 </html>

@@ -97,14 +97,14 @@
     <button id="fireBtn" type="button">Fire pixel</button>
     <div id="status">Ready — click to fire.</div>
     <p class="hint">
-      Fires <code>https://ad.ipredictive.com/d/track/cvt/pixel?upid=…</code>
+      Fires <code>https://ad.ipredictive.com/d/track/event?upid=…</code>
       as a 1×1 image request with <code>p1=click</code> so the Click event rule matches.
       Check Network for a 200 JPEG, then verify activity on the pixel in DSP.
     </p>
   </main>
   <script>
     const UPID = '118698';
-    const ENDPOINT = 'https://ad.ipredictive.com/d/track/cvt/pixel';
+    const ENDPOINT = 'https://ad.ipredictive.com/d/track/event';
 
     function buildUrl() {
       const params = new URLSearchParams({
@@ -112,7 +112,8 @@
         url: location.href,
         ref: document.referrer || '',
         p1: 'click',
-        _t: String(Date.now()),
+        ps: '1',
+        cache_buster: String(Date.now()),
       });
       return ENDPOINT + '?' + params.toString();
     }
@@ -123,17 +124,19 @@
       status.className = '';
       status.textContent = 'Firing…';
 
+      // /d/track/event returns 200 with an empty body; Image() may call onerror.
+      // Prefer sendBeacon / fetch(no-cors), then Image fallback.
+      let sent = false;
+      if (navigator.sendBeacon) {
+        sent = navigator.sendBeacon(url);
+      }
+      if (!sent) {
+        fetch(url, { mode: 'no-cors', credentials: 'include', cache: 'no-store' }).catch(() => {});
+      }
       const img = new Image();
-      img.onload = () => {
-        status.className = 'ok';
-        status.textContent = 'Fired OK — ' + url;
-      };
-      img.onerror = () => {
-        // Tracking pixels sometimes block error callbacks; still show URL.
-        status.className = 'err';
-        status.textContent = 'Request sent (onload failed to confirm) — ' + url;
-      };
       img.src = url;
+      status.className = 'ok';
+      status.textContent = 'Fired via /d/track/event — ' + url;
     }
 
     document.getElementById('fireBtn').addEventListener('click', firePixel);

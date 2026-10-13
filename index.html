@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Viant Universal Pixel Fire Test</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --panel: #1a2332;
+      --text: #e7ecf3;
+      --muted: #9aa8bc;
+      --accent: #3d8bfd;
+      --ok: #3dd68c;
+      --err: #f07178;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+      background:
+        radial-gradient(1200px 600px at 10% -10%, #1e3a5f 0%, transparent 55%),
+        radial-gradient(900px 500px at 100% 0%, #243049 0%, transparent 50%),
+        var(--bg);
+      color: var(--text);
+      display: grid;
+      place-items: center;
+      padding: 2rem;
+    }
+    main {
+      width: min(520px, 100%);
+      background: color-mix(in srgb, var(--panel) 92%, transparent);
+      border: 1px solid #2b3a4f;
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 20px 60px rgba(0,0,0,.35);
+    }
+    h1 {
+      margin: 0 0 .35rem;
+      font-size: 1.35rem;
+      font-weight: 650;
+      letter-spacing: -.02em;
+    }
+    .meta {
+      color: var(--muted);
+      font-size: .92rem;
+      line-height: 1.45;
+      margin-bottom: 1.5rem;
+    }
+    .meta code {
+      color: #cfe1ff;
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
+      font-size: .85em;
+    }
+    button {
+      appearance: none;
+      border: 0;
+      border-radius: 10px;
+      background: linear-gradient(180deg, #4d97ff, var(--accent));
+      color: white;
+      font: inherit;
+      font-weight: 600;
+      padding: .85rem 1.25rem;
+      width: 100%;
+      cursor: pointer;
+      transition: transform .12s ease, filter .12s ease;
+    }
+    button:hover { filter: brightness(1.05); }
+    button:active { transform: translateY(1px); }
+    #status {
+      margin-top: 1rem;
+      min-height: 1.4em;
+      font-size: .9rem;
+      color: var(--muted);
+      word-break: break-all;
+    }
+    #status.ok { color: var(--ok); }
+    #status.err { color: var(--err); }
+    .hint {
+      margin-top: 1.25rem;
+      font-size: .8rem;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Universal Pixel Fire Test</h1>
+    <p class="meta">
+      Pixel <code id="upidLabel">118698</code>
+      · advertiser <code>99680</code>
+      · name <code>test</code>
+    </p>
+    <button id="fireBtn" type="button">Fire pixel</button>
+    <div id="status">Ready — click to fire.</div>
+    <p class="hint">
+      Fires <code>https://ad.ipredictive.com/d/track/cvt/pixel?upid=…</code>
+      as a 1×1 image request (same endpoint the DSP tag uses).
+      Check Network for a 200 JPEG, then verify activity on the pixel in DSP.
+    </p>
+  </main>
+  <script>
+    const UPID = '118698';
+    const ENDPOINT = 'https://ad.ipredictive.com/d/track/cvt/pixel';
+
+    function buildUrl() {
+      const params = new URLSearchParams({
+        upid: UPID,
+        url: location.href,
+        ref: document.referrer || '',
+        _t: String(Date.now()),
+      });
+      return ENDPOINT + '?' + params.toString();
+    }
+
+    function firePixel() {
+      const status = document.getElementById('status');
+      const url = buildUrl();
+      status.className = '';
+      status.textContent = 'Firing…';
+
+      const img = new Image();
+      img.onload = () => {
+        status.className = 'ok';
+        status.textContent = 'Fired OK — ' + url;
+      };
+      img.onerror = () => {
+        // Tracking pixels sometimes block error callbacks; still show URL.
+        status.className = 'err';
+        status.textContent = 'Request sent (onload failed to confirm) — ' + url;
+      };
+      img.src = url;
+    }
+
+    document.getElementById('fireBtn').addEventListener('click', firePixel);
+  </script>
+</body>
+</html>

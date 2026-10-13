@@ -90,14 +90,15 @@
     <h1>Universal Pixel Fire Test</h1>
     <p class="meta">
       Pixel <code id="upidLabel">118698</code>
+      · event <code>Click</code> (<code>p1=click</code>)
+      · campaign/order <code>hackathon</code>
       · advertiser <code>99680</code>
-      · name <code>test</code>
     </p>
     <button id="fireBtn" type="button">Fire pixel</button>
     <div id="status">Ready — click to fire.</div>
     <p class="hint">
       Fires <code>https://ad.ipredictive.com/d/track/cvt/pixel?upid=…</code>
-      as a 1×1 image request (same endpoint the DSP tag uses).
+      as a 1×1 image request with <code>p1=click</code> so the Click event rule matches.
       Check Network for a 200 JPEG, then verify activity on the pixel in DSP.
     </p>
   </main>
@@ -110,6 +111,7 @@
         upid: UPID,
         url: location.href,
         ref: document.referrer || '',
+        p1: 'click',
         _t: String(Date.now()),
       });
       return ENDPOINT + '?' + params.toString();

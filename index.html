@@ -125,6 +125,27 @@
       color: var(--muted);
       line-height: 1.45;
     }
+    .blurb {
+      margin: .85rem 0 0;
+      padding: .85rem 1rem;
+      border-radius: 10px;
+      border: 1px solid #2b3a4f;
+      background: rgba(0,0,0,.18);
+      font-size: .82rem;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+    .blurb strong { color: var(--text); font-weight: 650; }
+    .blurb ol {
+      margin: .55rem 0 0;
+      padding-left: 1.15rem;
+    }
+    .blurb li { margin: .28rem 0; }
+    .blurb li code {
+      color: #cfe1ff;
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
+      font-size: .9em;
+    }
   </style>
 </head>
 <body>
@@ -139,6 +160,16 @@
       · GTM <code>GTM-N5R62S43</code>
       · pixels <code>118357</code> / <code>118359</code>
     </p>
+    <div class="blurb">
+      <strong>What this page tests</strong> — each button fires a Viant Universal Pixel request so you can prove DSP rules + GTM + BigQuery. Open DevTools → Network → filter <code>ipredictive</code>, click once, wait 2–4 min, then run <code>validate_universal_pixel_setup</code>.
+      <ol>
+        <li><strong>Click 118357 / 118359</strong> — correct <code>/d/track/event</code> with <code>p1=click</code> (also hits published GTM tags). Expect validate <code>ready</code>.</li>
+        <li><strong>Bad path</strong> — wrong endpoint <code>/d/track/cvt/pixel</code>. Expect <code>bad_fire_url</code> (no useful <code>ad_pixels</code> event).</li>
+        <li><strong>Wrong p1</strong> — sends <code>p1=Click</code> instead of <code>click</code>. Raw fire may land; event does not sort → <code>not_sorted</code>.</li>
+        <li><strong>Placeholders</strong> — leaves DSP brackets like <code>[url]</code> / <code>[Event]</code> in the URL. Expect <code>setup_broken</code>.</li>
+        <li><strong>Purchase sim</strong> — staging fire with <code>val</code> + <code>tn</code> (no real checkout). Use for purchase-style QA without a card.</li>
+      </ol>
+    </div>
 
     <h2>Happy path</h2>
     <div class="actions">

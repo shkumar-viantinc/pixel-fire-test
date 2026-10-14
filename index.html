@@ -161,54 +161,60 @@
       · pixels <code>118357</code> / <code>118359</code>
     </p>
     <div class="blurb">
-      <strong>What this page tests</strong> — each button fires a Viant Universal Pixel request so you can prove DSP rules + GTM + BigQuery. Open DevTools → Network → filter <code>ipredictive</code>, click once, wait 2–4 min, then run <code>validate_universal_pixel_setup</code>.
+      <strong>How to use this page</strong>
+      <p style="margin:.45rem 0 0">
+        Each blue/red button sends a tracking hit to Viant (like a real site would).
+        You are checking: “Did the right pixel fire, with the right values, and did our tools catch good vs bad setups?”
+      </p>
+      <p style="margin:.45rem 0 0">
+        Tip: Chrome → right-click → Inspect → <strong>Network</strong> tab → type <code>ipredictive</code> in the filter → click a button → look at the request URL. Wait a few minutes, then ask the agent to validate.
+      </p>
       <ol>
-        <li><strong>Click 118357 / 118359</strong> — correct <code>/d/track/event</code> with <code>p1=click</code> (also hits published GTM tags). Expect validate <code>ready</code>.</li>
-        <li><strong>Bad path</strong> — wrong endpoint <code>/d/track/cvt/pixel</code>. Expect <code>bad_fire_url</code> (no useful <code>ad_pixels</code> event).</li>
-        <li><strong>Wrong p1</strong> — sends <code>p1=Click</code> instead of <code>click</code>. Raw fire may land; event does not sort → <code>not_sorted</code>.</li>
-        <li><strong>Placeholders</strong> — leaves DSP brackets like <code>[url]</code> / <code>[Event]</code> in the URL. Expect <code>setup_broken</code>.</li>
-        <li><strong>Purchase sim</strong> — staging fire with <code>val</code> + <code>tn</code> (no real checkout). Use for purchase-style QA without a card.</li>
+        <li><strong>Click 118357</strong> — “good” click for pixel A. Should succeed (counts as a click event).</li>
+        <li><strong>Click 118359</strong> — same “good” click for pixel B on this page.</li>
+        <li><strong>Bad path</strong> — deliberately uses the <em>wrong</em> tracking URL. Should fail validation (common client mistake).</li>
+        <li><strong>Wrong p1</strong> — fires, but sends the wrong event label (<code>Click</code> vs <code>click</code>). Shows up as a hit that does <em>not</em> match the DSP rule.</li>
+        <li><strong>Placeholders</strong> — fires with leftover template text like <code>[url]</code> instead of a real page URL. Shows a broken tag install.</li>
+        <li><strong>Purchase sim</strong> — fake “order completed” hit with revenue + order id. No real checkout / no credit card.</li>
       </ol>
     </div>
 
-    <h2>Happy path</h2>
+    <h2>Should work (good setup)</h2>
     <div class="actions">
       <button id="fireBtn118357" type="button">
         Click 118357
-        <small>S1 · /d/track/event · p1=click · event 233203</small>
+        <small>Good fire for pixel A — should pass</small>
       </button>
       <button id="fireBtn118359" class="secondary" type="button">
         Click 118359
-        <small>S2 · /d/track/event · p1=click · event 233204</small>
+        <small>Good fire for pixel B — should pass</small>
       </button>
     </div>
 
-    <h2>Negative / edge</h2>
+    <h2>Should fail (broken setups we detect)</h2>
     <div class="actions">
       <button id="btnBadPath" class="neg" type="button">
         Bad path
-        <small>S5 · /d/track/cvt/pixel · expect bad_fire_url</small>
+        <small>Wrong tracking URL — should fail</small>
       </button>
       <button id="btnWrongP1" class="neg" type="button">
         Wrong p1
-        <small>S6 · p1=Click (not click) · expect not_sorted</small>
+        <small>Wrong event label — fires but won’t match the rule</small>
       </button>
       <button id="btnPlaceholders" class="neg" type="button">
         Placeholders
-        <small>S4 · literal [url]/[Event] · expect setup_broken</small>
+        <small>Template text left in the tag — broken install</small>
       </button>
       <button id="btnPurchase" class="purchase" type="button">
         Purchase sim
-        <small>Staging · val=12.34 · tn=test · no real card</small>
+        <small>Fake purchase with revenue — no real card</small>
       </button>
     </div>
 
-    <div id="status">Ready — pick a scenario.</div>
+    <div id="status">Ready — pick a button above.</div>
     <p class="hint">
-      Happy buttons also trip published GTM click tags (may double-send img+beacon — OK).
-      Negatives are <strong>inline only</strong> so they do not change the live GTM container.
-      S3 = Preview vs Publish (process). S7 = block trackers in browser. S8 = count Network rows on one happy click.
-      Network filter: <code>ipredictive</code>. Wait 2–4 min before BQ / validate.
+      Blue buttons also fire the live GTM tags (you may see 2 network rows — that is normal).
+      Red buttons only fire from this page (they do not change GTM).
     </p>
   </main>
   <script>

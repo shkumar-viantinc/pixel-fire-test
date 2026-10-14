@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-NSR62SKJ');</script>
+  <!-- End Google Tag Manager -->
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Viant Universal Pixel Fire Test</title>
@@ -96,13 +103,19 @@
   </style>
 </head>
 <body>
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NSR62SKJ"
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
   <main>
     <h1>Universal Pixel Fire Test</h1>
     <p class="meta">
       Advertiser <code>111648</code> hackathon
       · agency <code>29755</code> runtime_agency (mcp7)
       · campaign <code>563612</code> / order <code>2704998</code>
+      · GTM <code>GTM-NSR62SKJ</code>
       · both buttons fire <code>/d/track/event</code> with <code>p1=click</code>
+      (inline JS + optional GTM click tags)
     </p>
     <div class="actions">
       <button id="fireBtn118357" type="button">Fire pixel 118357</button>
@@ -113,6 +126,7 @@
       <code>118357</code> Click event <code>233203</code>.
       <code>118359</code> Click event <code>233204</code> (replacement for unwired <code>118358</code> — API could not update that pixel).
       Neither button is auto-fired on page load.
+      With GTM click tags published, each click may send both the inline fire and the GTM tag fire.
     </p>
   </main>
   <script>

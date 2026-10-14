@@ -1,0 +1,113 @@
+{
+  "exportFormatVersion": 2,
+  "exportTime": "2026-10-14 19:20:00",
+  "containerVersion": {
+    "path": "accounts/6382577178/containers/267146845/versions/0",
+    "accountId": "6382577178",
+    "containerId": "267146845",
+    "containerVersionId": "0",
+    "container": {
+      "path": "accounts/6382577178/containers/267146845",
+      "accountId": "6382577178",
+      "containerId": "267146845",
+      "name": "hackathon-test",
+      "publicId": "GTM-N5R62S43",
+      "usageContext": ["WEB"],
+      "fingerprint": "1",
+      "tagManagerUrl": "https://tagmanager.google.com/#/container/accounts/6382577178/containers/267146845/workspaces"
+    },
+    "tag": [
+      {
+        "accountId": "6382577178",
+        "containerId": "267146845",
+        "tagId": "1",
+        "name": "UP 118357 Click",
+        "type": "html",
+        "parameter": [
+          {
+            "type": "TEMPLATE",
+            "key": "html",
+            "value": "<img src=\"https://ad.ipredictive.com/d/track/event?upid=118357&url={{Page URL}}&p1=click&cache_buster=[timestamp]&ps=2\" height=\"1\" width=\"1\" style=\"display:none\" alt=\"\" />"
+          },
+          {
+            "type": "BOOLEAN",
+            "key": "supportDocumentWrite",
+            "value": "false"
+          }
+        ],
+        "fingerprint": "1",
+        "firingTriggerId": ["1"],
+        "tagFiringOption": "ONCE_PER_EVENT",
+        "monitoringMetadata": { "type": "MAP" },
+        "consentSettings": { "consentStatus": "NOT_SET" }
+      },
+      {
+        "accountId": "6382577178",
+        "containerId": "267146845",
+        "tagId": "2",
+        "name": "UP 118359 Click",
+        "type": "html",
+        "parameter": [
+          {
+            "type": "TEMPLATE",
+            "key": "html",
+            "value": "<img src=\"https://ad.ipredictive.com/d/track/event?upid=118359&url={{Page URL}}&p1=click&cache_buster=[timestamp]&ps=2\" height=\"1\" width=\"1\" style=\"display:none\" alt=\"\" />"
+          },
+          {
+            "type": "BOOLEAN",
+            "key": "supportDocumentWrite",
+            "value": "false"
+          }
+        ],
+        "fingerprint": "2",
+        "firingTriggerId": ["2"],
+        "tagFiringOption": "ONCE_PER_EVENT",
+        "monitoringMetadata": { "type": "MAP" },
+        "consentSettings": { "consentStatus": "NOT_SET" }
+      }
+    ],
+    "trigger": [
+      {
+        "accountId": "6382577178",
+        "containerId": "267146845",
+        "triggerId": "1",
+        "name": "Click - fireBtn118357",
+        "type": "CLICK",
+        "filter": [
+          {
+            "type": "EQUALS",
+            "parameter": [
+              { "type": "TEMPLATE", "key": "arg0", "value": "{{Click ID}}" },
+              { "type": "TEMPLATE", "key": "arg1", "value": "fireBtn118357" }
+            ]
+          }
+        ],
+        "fingerprint": "1"
+      },
+      {
+        "accountId": "6382577178",
+        "containerId": "267146845",
+        "triggerId": "2",
+        "name": "Click - fireBtn118359",
+        "type": "CLICK",
+        "filter": [
+          {
+            "type": "EQUALS",
+            "parameter": [
+              { "type": "TEMPLATE", "key": "arg0", "value": "{{Click ID}}" },
+              { "type": "TEMPLATE", "key": "arg1", "value": "fireBtn118359" }
+            ]
+          }
+        ],
+        "fingerprint": "2"
+      }
+    ],
+    "builtInVariable": [
+      { "accountId": "6382577178", "containerId": "267146845", "type": "PAGE_URL", "name": "Page URL" },
+      { "accountId": "6382577178", "containerId": "267146845", "type": "CLICK_ID", "name": "Click ID" },
+      { "accountId": "6382577178", "containerId": "267146845", "type": "CLICK_ELEMENT", "name": "Click Element" }
+    ],
+    "fingerprint": "1",
+    "tagManagerUrl": "https://tagmanager.google.com/#/versions/accounts/6382577178/containers/267146845/versions/0?apiLink=container"
+  }
+}

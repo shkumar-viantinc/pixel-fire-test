@@ -20,7 +20,9 @@
       --accent: #3d8bfd;
       --accent2: #5b8def;
       --ok: #3dd68c;
+      --warn: #e6c07b;
       --err: #f07178;
+      --neg: #c45c66;
     }
     * { box-sizing: border-box; }
     body {
@@ -37,7 +39,7 @@
       padding: 2rem;
     }
     main {
-      width: min(520px, 100%);
+      width: min(560px, 100%);
       background: color-mix(in srgb, var(--panel) 92%, transparent);
       border: 1px solid #2b3a4f;
       border-radius: 16px;
@@ -50,13 +52,21 @@
       font-weight: 650;
       letter-spacing: -.02em;
     }
+    h2 {
+      margin: 1.35rem 0 .55rem;
+      font-size: .78rem;
+      font-weight: 650;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
     .meta {
       color: var(--muted);
       font-size: .92rem;
       line-height: 1.45;
-      margin-bottom: 1.5rem;
+      margin-bottom: .25rem;
     }
-    .meta code {
+    .meta code, .hint code {
       color: #cfe1ff;
       font-family: "IBM Plex Mono", ui-monospace, monospace;
       font-size: .85em;
@@ -64,7 +74,7 @@
     .actions {
       display: flex;
       flex-direction: column;
-      gap: .75rem;
+      gap: .65rem;
     }
     button {
       appearance: none;
@@ -73,32 +83,47 @@
       color: white;
       font: inherit;
       font-weight: 600;
-      padding: .85rem 1.25rem;
+      padding: .8rem 1.15rem;
       width: 100%;
       cursor: pointer;
       transition: transform .12s ease, filter .12s ease;
-      font-variant-numeric: tabular-nums;
+      text-align: left;
       background: linear-gradient(180deg, #4d97ff, var(--accent));
     }
     button.secondary {
       background: linear-gradient(180deg, #6aa0f0, var(--accent2));
+    }
+    button.neg {
+      background: linear-gradient(180deg, #d06a74, var(--neg));
+    }
+    button.purchase {
+      background: linear-gradient(180deg, #d4b06a, #b8893a);
+      color: #1a1408;
+    }
+    button small {
+      display: block;
+      font-weight: 500;
+      opacity: .85;
+      font-size: .78rem;
+      margin-top: .15rem;
     }
     button:hover { filter: brightness(1.05); }
     button:active { transform: translateY(1px); }
     #status {
       margin-top: 1rem;
       min-height: 1.4em;
-      font-size: .9rem;
+      font-size: .88rem;
       color: var(--muted);
       word-break: break-all;
     }
     #status.ok { color: var(--ok); }
+    #status.warn { color: var(--warn); }
     #status.err { color: var(--err); }
     .hint {
-      margin-top: 1.25rem;
-      font-size: .8rem;
+      margin-top: 1.1rem;
+      font-size: .78rem;
       color: var(--muted);
-      line-height: 1.4;
+      line-height: 1.45;
     }
   </style>
 </head>
@@ -110,29 +135,71 @@
   <main>
     <h1>Universal Pixel Fire Test</h1>
     <p class="meta">
-      Advertiser <code>111648</code> hackathon
-      · agency <code>29755</code> runtime_agency (mcp7)
-      · campaign <code>563612</code> / order <code>2704998</code>
+      Adv <code>111648</code> · camp <code>563612</code> · order <code>2704998</code>
       · GTM <code>GTM-N5R62S43</code>
-      · both buttons fire <code>/d/track/event</code> with <code>p1=click</code>
-      (inline JS + optional GTM click tags)
+      · pixels <code>118357</code> / <code>118359</code>
     </p>
+
+    <h2>Happy path</h2>
     <div class="actions">
-      <button id="fireBtn118357" type="button">Fire pixel 118357</button>
-      <button id="fireBtn118359" class="secondary" type="button">Fire pixel 118359</button>
+      <button id="fireBtn118357" type="button">
+        Click 118357
+        <small>S1 · /d/track/event · p1=click · event 233203</small>
+      </button>
+      <button id="fireBtn118359" class="secondary" type="button">
+        Click 118359
+        <small>S2 · /d/track/event · p1=click · event 233204</small>
+      </button>
     </div>
-    <div id="status">Ready — pick a pixel id to fire.</div>
+
+    <h2>Negative / edge</h2>
+    <div class="actions">
+      <button id="btnBadPath" class="neg" type="button">
+        Bad path
+        <small>S5 · /d/track/cvt/pixel · expect bad_fire_url</small>
+      </button>
+      <button id="btnWrongP1" class="neg" type="button">
+        Wrong p1
+        <small>S6 · p1=Click (not click) · expect not_sorted</small>
+      </button>
+      <button id="btnPlaceholders" class="neg" type="button">
+        Placeholders
+        <small>S4 · literal [url]/[Event] · expect setup_broken</small>
+      </button>
+      <button id="btnPurchase" class="purchase" type="button">
+        Purchase sim
+        <small>Staging · val=12.34 · tn=test · no real card</small>
+      </button>
+    </div>
+
+    <div id="status">Ready — pick a scenario.</div>
     <p class="hint">
-      <code>118357</code> Click event <code>233203</code>.
-      <code>118359</code> Click event <code>233204</code> (replacement for unwired <code>118358</code> — API could not update that pixel).
-      Neither button is auto-fired on page load.
-      With GTM click tags published, each click may send both the inline fire and the GTM tag fire.
+      Happy buttons also trip published GTM click tags (may double-send img+beacon — OK).
+      Negatives are <strong>inline only</strong> so they do not change the live GTM container.
+      S3 = Preview vs Publish (process). S7 = block trackers in browser. S8 = count Network rows on one happy click.
+      Network filter: <code>ipredictive</code>. Wait 2–4 min before BQ / validate.
     </p>
   </main>
   <script>
-    const ENDPOINT = 'https://ad.ipredictive.com/d/track/event';
+    const EVENT = 'https://ad.ipredictive.com/d/track/event';
+    const CVT = 'https://ad.ipredictive.com/d/track/cvt/pixel';
 
-    function buildUrl(upid) {
+    function send(url, tone) {
+      const status = document.getElementById('status');
+      status.className = tone || '';
+      status.textContent = 'Firing…';
+      let sent = false;
+      if (navigator.sendBeacon) sent = navigator.sendBeacon(url);
+      if (!sent) {
+        fetch(url, { mode: 'no-cors', credentials: 'include', cache: 'no-store' }).catch(() => {});
+      }
+      const img = new Image();
+      img.src = url;
+      status.className = tone || 'ok';
+      status.textContent = (tone === 'warn' || tone === 'err' ? 'Sent (expect fail) — ' : 'Fired — ') + url;
+    }
+
+    function happy(upid) {
       const params = new URLSearchParams({
         upid: String(upid),
         url: location.href,
@@ -141,30 +208,62 @@
         ps: '1',
         cache_buster: String(Date.now()),
       });
-      return ENDPOINT + '?' + params.toString();
+      send(EVENT + '?' + params.toString(), 'ok');
     }
 
-    function firePixel(upid) {
-      const status = document.getElementById('status');
-      const url = buildUrl(upid);
-      status.className = '';
-      status.textContent = 'Firing ' + upid + '…';
-
-      let sent = false;
-      if (navigator.sendBeacon) {
-        sent = navigator.sendBeacon(url);
-      }
-      if (!sent) {
-        fetch(url, { mode: 'no-cors', credentials: 'include', cache: 'no-store' }).catch(() => {});
-      }
-      const img = new Image();
-      img.src = url;
-      status.className = 'ok';
-      status.textContent = 'Fired pixel ' + upid + ' via /d/track/event — ' + url;
+    function badPath() {
+      const params = new URLSearchParams({
+        upid: '118357',
+        url: location.href,
+        p1: 'click',
+        cache_buster: String(Date.now()),
+      });
+      send(CVT + '?' + params.toString(), 'err');
     }
 
-    document.getElementById('fireBtn118357').addEventListener('click', () => firePixel(118357));
-    document.getElementById('fireBtn118359').addEventListener('click', () => firePixel(118359));
+    function wrongP1() {
+      const params = new URLSearchParams({
+        upid: '118357',
+        url: location.href,
+        ref: document.referrer || '',
+        p1: 'Click',
+        ps: '1',
+        cache_buster: String(Date.now()),
+      });
+      send(EVENT + '?' + params.toString(), 'warn');
+    }
+
+    function placeholders() {
+      // Intentionally leave DSP-style brackets unresolved.
+      const url = EVENT
+        + '?upid=118357'
+        + '&url=[url]'
+        + '&p1=[Event]'
+        + '&cache_buster=[timestamp]'
+        + '&ps=2';
+      send(url, 'err');
+    }
+
+    function purchaseSim() {
+      const params = new URLSearchParams({
+        upid: '118357',
+        url: location.href,
+        ref: document.referrer || '',
+        p1: 'click',
+        val: '12.34',
+        tn: 'hackathon-tn-' + Date.now(),
+        ps: '1',
+        cache_buster: String(Date.now()),
+      });
+      send(EVENT + '?' + params.toString(), 'ok');
+    }
+
+    document.getElementById('fireBtn118357').addEventListener('click', () => happy(118357));
+    document.getElementById('fireBtn118359').addEventListener('click', () => happy(118359));
+    document.getElementById('btnBadPath').addEventListener('click', badPath);
+    document.getElementById('btnWrongP1').addEventListener('click', wrongP1);
+    document.getElementById('btnPlaceholders').addEventListener('click', placeholders);
+    document.getElementById('btnPurchase').addEventListener('click', purchaseSim);
   </script>
 </body>
 </html>
